@@ -111,10 +111,12 @@ def add(content, category_text = None):
     else:
         category_id = get_category(category_text)
 
+    is_done = 0
+
     created_at = int(time.time())
 
-    data = (user_id, category_id, content, created_at)
-    c.execute("INSERT INTO main (user_id, category_id, content, created_at) VALUES (?, ?, ?, ?)", data)
+    data = (user_id, category_id, content, is_done, created_at)
+    c.execute("INSERT INTO main (user_id, category_id, content, is_done, created_at) VALUES (?, ?, ?, ?, ?)", data)
     db.commit()
 
 def view():
@@ -123,6 +125,7 @@ def view():
         FROM main
         JOIN users ON main.user_id = users.id
         JOIN categories ON main.category_id = categories.id
+        WHERE main.is_done = 0
     """)
 
     table_view = c.fetchall()
@@ -131,8 +134,23 @@ def view():
     print("-" * 50)
 
     for row in table_view:
-        t_id, user, cat, txt = row
+        t_id, user, cat, txt, = row
         print(f"{t_id:<4} | {user:<8} | {cat:<8} | {txt:<40}")
+
+def delete():
+    view()
+
+    user_input = int(input("Введіть номер рядку: "))
+
+    c.execute("SELECT 0 FROM main WHERE id = ?", (user_input,))
+    if c.fetchone() is None:
+        print(f"Рядка {user_input} не існує")
+    else:
+        c.execute("UPDATE main SET is_done = 1 WHERE id = ?", (user_input,))
+        print("Видалено")
+
+    db.commit()
+
 
 if __name__ == "__main__":
 
@@ -145,6 +163,7 @@ if __name__ == "__main__":
     # parser.add_argument("-u", "--user", nargs=1)
     parser.add_argument("--default_user", action="store_true")
     parser.add_argument("-v", "--view", action="store_true")
+    parser.add_argument("-d", "--delete", action="store_true")
 
 
     args = parser.parse_args()
@@ -168,4 +187,8 @@ if __name__ == "__main__":
 
     if args.view:
         view()
+
+    if args.delete:
+        delete()
+
     db.close()
