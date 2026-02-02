@@ -134,7 +134,7 @@ def view():
     print("-" * 50)
 
     for row in table_view:
-        t_id, user, cat, txt, = row
+        t_id, user, cat, txt = row
         print(f"{t_id:<4} | {user:<8} | {cat:<8} | {txt:<40}")
 
 def delete():
