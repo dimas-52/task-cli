@@ -78,7 +78,7 @@ def default_user():
 
     c.execute("SELECT id FROM users")
     users_id = c.fetchall()
-    print("Стантартний користувач[", end = "")
+    print("Стандартний користувач[", end = "")
     for i in users_id:
         print(i[0], end=", " if i != users_id[-1] else "")
     default_user_id = input("]: ")
@@ -139,9 +139,11 @@ def view():
 
 def delete():
     view()
-
-    user_input = int(input("Введіть номер рядку: "))
-
+    try:
+        user_input = int(input("Введіть номер рядку: "))
+    except ValueError:
+        print("Помилка: введіть число!")
+        return
     c.execute("SELECT 0 FROM main WHERE id = ?", (user_input,))
     if c.fetchone() is None:
         print(f"Рядка {user_input} не існує")
